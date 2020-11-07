@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
+	<link rel="stylesheet" type="text/css" href="/font-awesome/css/font-awesome.min.css" />
+<style type="text/css">
+	.skin-flat .skin-section .list li, .skin-line .skin-section label {
+    padding-left: 40px;
+}
+</style>
+</head>
+<body  oncontextmenu="return false">
+	<section id="page">
+		<div id="main-content">
+			<div class="container">
+				<div class="row">
+					<div id="content" class="col-lg-12" style="min-height:1063px !important">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="page-header">
+									<ul class="breadcrumb">
+										<li>
+											<i class="fa fa-home"></i>
+										</li>
+										<li>Welcome</li>
+										<li>Today's Quiz</li>
+									</ul>
+									<div class="clearfix">
+										<h3 class="content-title pull-left">Question <strong>{{ question_index }}</strong> of {{ total_questions }}</h3>
+									</div>
+									<div class="description">Question expires in <span class="badge badge-red">{{ question.allowed_time }}</span> seconds.</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="box border blue">
+									<div class="box-title">
+										<h4><i class="fa fa-bars"></i> <span class="hidden-inline-mobile">Question #{{ question_index }}</span></h4>
+										<div class="items">
+											<div class="progress progress-striped active">
+												<div id="time_progress" style="width: 0%" aria-valuemax="{{ question.allowed_time }}" aria-valuemin="0" aria-valuenow="0" role="progressbar" class="progress-bar progress-bar-info"></div>
+										</div>
+										</div>
+									</div>
+									<div class="box-body">
+										<blockquote><p>{{ question.title|striptags }}</p></blockquote>
+										{% if question.image %}
+										<div class="jumbotron">
+											<img src="{{ UPLOAD_DIR }}{{ question.image }}" class="thumbnail">
+										</div>
+										{% endif %}
+										<form method="POST" action="#" class="form-horizontal">
+											<div class="form-group">
+											 <div class="col-md-8">
+											
+											 	{% for choice in question.choices %}
+											 	<label class="radio">
+													<div class="radio">
+														<span style="vertical-align: middle">
+															<input type="radio" value="{{ loop.index }}" name="choice" class="uniform">
+															<label for="choice" style="padding-left:5px;"><strong>{{ choice.choice_text|striptags }}</strong></label>
+														</span>
+													</div>
+												</label>
+												{% endfor %}
+				
+											 </div>
+										  </div>
+										</form>
+									</div>
+								</div>
+						
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script type="text/javascript" src="/javascripts/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/javascripts/icheck.min.js"></script>
+	<script type="text/javascript" src="/javascripts/jquery.cookie.min.js"></script>
+	<script type="text/javascript" src="/javascripts/script.js"></script>
+	<script type="text/javascript">
+		jQuery(document).ready(function() {		
+
+			$('input').iCheck({
+				radioClass: 'iradio_flat-aero'
+			});
+
+			var count = '{{ question.allowed_time }}' || 10;
+			var counter = setInterval(function(){timer()}, 1000);
+			var progress_percent = 100 / count;
+			function timer() {
+				count = count - 1;
+				if (count <= 0)
+				{
+					$('#time_progress').css('width', '100%').attr('aria-valuenow', '100');
+					clearInterval(counter);
+					return;
+				}
+				$('#time_progress').css('width', progress_percent + '%').attr('aria-valuenow', progress_percent);
+				progress_percent = progress_percent + 100 / '{{ question.allowed_time }}';
+			}
+
+			$('input').on('ifChecked', function(event){
+				$('div.radio').addClass('disabled');
+				$('form').submit();
+			});
+		});
+	</script>
+</body>
+</html>

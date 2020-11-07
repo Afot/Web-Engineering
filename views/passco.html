@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+ 
+    <link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/default.css" id="skin-switcher" />
+    <style type="text/css"></style>
+</head>
+<body>
+    <section id="page">
+        <div class="sidebar mini-menu" id="sidebar">
+            <div class="sidebar-menu nav-collapse">
+                <div class="divide-20"></div>
+                <ul>
+                    <li>
+                        <a href="{{ URL.QUIZ_ADMIN }}">
+                            <i class="fa fa-list fa-fw"></i> <span class="menu-text">Quiz</span>
+                        </a>
+                    </li>
+                    <li class="has-sub active">
+                        <a class="" href="javascript:;">
+                        <i class="fa fa-bar-chart-o fa-fw"></i> <span class="menu-text">Data</span>
+                        <span class="arrow"></span>
+                        </a>
+                        <ul class="sub">
+                            <li>
+                                <a href="{{ URL.QUIZ_ADMIN_DATA }}">
+                                    <span class="sub-menu-text">User Data</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ URL.QUIZ_ADMIN_ARCHIVE }}">
+                                    <span class="sub-menu-text">Archive</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ URL.QUIZ_ADMIN_FEEDBACK }}">
+                                    <span class="sub-menu-text">Feedback{% if FEEDBACK_UNREAD > 0%}<span class="badge pull-right" style="margin-right: 10px; background-color: #DD5A43;">{{ FEEDBACK_UNREAD }}</span>{% endif %}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="main-content" class="margin-left-50">
+            <div class="container">
+                <div class="row">
+                    <div id="content" class="col-lg-12" style="min-height:1063px !important">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="page-header">
+                                    <ul class="breadcrumb">
+                                        <li>
+                                            <i class="fa fa-home"></i>
+                                        </li>
+                                        <li>Administration</li>
+                                        <li>Data</li>
+                                        <li>Archive</li>
+                                    </ul>
+                                    <div class="clearfix">
+                                        <h3 class="content-title pull-left">Pass Questions</h3>
+                                    </div>
+                                    <div class="description">All the questions from quizzes past.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 box-container box-question">
+                            <div class="box border green">
+                                <div class="box-title">
+                                    <h4><i class="fa fa-table"></i>Past Questions</h4>
+                                    <div class="tools">
+                                        <a class="collapse" href="javascript:;">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <table id="datatable" class="datatable table table-striped table-bordered table-hover dataTable userdata" cellspacing="0" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Question</th>
+                                                <th>Answer</th>
+                                                <th>Appeared on</th>
+                                                <th>Allowed Time</th>
+                                                <th>Image</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="footer-tools">
+                            <span class="go-top">
+                                <i class="fa fa-chevron-up"></i> Top
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript" src="/javascripts/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+    <script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/javascripts/bootbox.min.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/javascripts/datatables.min.js"></script>
+    <script type="text/javascript" src="/javascripts/TableTools.min.js"></script>
+    <script type="text/javascript" src="/javascripts/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="/javascripts/script.js"></script>
+    <script type="text/javascript">
+
+        jQuery(document).ready(function() {     
+
+            $('#datatable').dataTable({
+                'bProcessing': true,
+                'sAjaxSource': '{{URL.QUIZ_ADMIN_DATA_AJAX}}?archive=0',
+                'sPaginationType': 'bs_full',
+                'aaSorting': [],
+                'sDom': "<'row'<'dataTables_header clearfix'<'col-md-4'l><'col-md-8'Tf>r>>t<'row'<'dataTables_footer clearfix'<'col-md-6'i><'col-md-6'p>>>",
+                'oTableTools': {
+                    'aButtons': ['copy', 'print', 'csv', 'xls', 'pdf'],
+                    'sSwfPath': '/swf/copy_csv_xls_pdf.swf'
+                },
+                'oLanguage': {
+                    'sProcessing': '<img src="/images/fetching.gif"></img>'
+                },
+                'fnCreatedRow': function(row, data, index) {
+                    $('td', row).eq(2).html('<abbr class="timeago" title="' + data[2] + '">' + data[2] + '</abbr>');
+                    if(data[4]) {
+                        $('td', row).eq(4).html('<a rel="popover" href="{{UPLOAD_DIR}}' + data[4] + '" target="_blank">' + data[4] + '</a>');
+                    }
+                },
+                'fnDrawCallback': function(settings) {
+                    $('abbr.timeago').timeago();
+                    $('a[rel=popover]').popover({
+                        title:'Preview',
+                        html: true,
+                        trigger:'hover',
+                        placement:'left',
+                        content: function() {
+                            return '<img src="' + this.href + '"></img>';
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
